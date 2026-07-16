@@ -617,6 +617,66 @@
     font-weight: 500;
   }
 
+  .drawer-waitlist {
+    margin-top: auto;
+    padding-top: 28px;
+    border-top: 1px solid rgba(54,45,29,0.15);
+  }
+  .drawer-waitlist-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--chocolate);
+    opacity: 0.65;
+    margin-bottom: 8px;
+  }
+  .drawer-waitlist-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--chocolate);
+    margin-bottom: 6px;
+  }
+  .drawer-waitlist-body {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: rgba(54,45,29,0.75);
+    margin-bottom: 14px;
+  }
+  .drawer-waitlist-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .drawer-waitlist-input {
+    padding: 12px 14px;
+    border: 1px solid rgba(54,45,29,0.25);
+    background: rgba(255,255,255,0.5);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--chocolate);
+  }
+  .drawer-waitlist-input::placeholder { color: rgba(54,45,29,0.5); }
+  .drawer-waitlist-input:focus { border-color: var(--chocolate); background: #fff; }
+  .drawer-waitlist-submit {
+    padding: 12px 14px;
+    border: none;
+    border-radius: 4px;
+    background: var(--chocolate);
+    color: var(--cream);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .drawer-waitlist-fine {
+    font-size: 11px;
+    line-height: 1.4;
+    color: rgba(54,45,29,0.6);
+    margin-top: 10px;
+  }
+
   @media (min-width: 861px) {
     .drawer-overlay, .drawer { display: none; }
   }
@@ -734,9 +794,6 @@
       <button class="icon-btn" aria-label="Search">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-      <button class="icon-btn" aria-label="Account">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
-      </button>
       <button class="icon-btn" aria-label="Bag">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 7h12l1 14H5L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
       </button>
@@ -837,11 +894,11 @@
       </h2>
       <p class="popup-body">We're launching soon. <strong>Join the early list</strong> and be the first to shop each hand-crocheted drop, plus lock in 20% off before we open to everyone.</p>
 
-      <form class="popup-form" onsubmit="return false;">
-        <input type="email" class="popup-input" placeholder="Email address" required>
-        <button type="submit" class="popup-submit">Get Early Access</button>
+      <form class="popup-form" id="popupForm">
+        <input type="email" class="popup-input" id="popupEmail" placeholder="Email address" required>
+        <button type="submit" class="popup-submit" id="popupSubmitBtn">Get Early Access</button>
       </form>
-      <p class="popup-fine">Limited to our first 200 members. No spam, just launch news.</p>
+      <p class="popup-fine" id="popupFine">Limited to our first 200 members. No spam, just launch news.</p>
     </div>
   </div>
 </div>
@@ -858,6 +915,17 @@
     <a href="#">Our Craft</a>
     <a href="#">Journal</a>
     <a href="#">Account</a>
+  </div>
+
+  <div class="drawer-waitlist">
+    <p class="drawer-waitlist-eyebrow">Pre-Launch Access</p>
+    <p class="drawer-waitlist-title">Join the Early List</p>
+    <p class="drawer-waitlist-body">Be first to shop each drop and lock in 20% off before we open to everyone.</p>
+    <form class="drawer-waitlist-form" id="drawerWaitlistForm">
+      <input type="email" class="drawer-waitlist-input" id="drawerWaitlistEmail" placeholder="Email address" required>
+      <button type="submit" class="drawer-waitlist-submit" id="drawerWaitlistSubmitBtn">Get Early Access</button>
+    </form>
+    <p class="drawer-waitlist-fine" id="drawerWaitlistFine">Limited to our first 200 members. No spam, just launch news.</p>
   </div>
 </nav>
 
@@ -923,6 +991,64 @@
       setTimeout(openPopup, 900);
       sessionStorage.setItem('chinaza_prelaunch_seen', '1');
     }
+
+    // ---------- EARLY ACCESS EMAIL CAPTURE (Google Sheet) ----------
+    // Paste your Apps Script Web App URL below (see setup instructions).
+    var SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx7jEhY_D5_R8XNVs3Gys5_tBB0jmbRaLVwNlpgJcImb35mu8wxMlDMnD7sVNz6Wszm/exec';
+
+    function setupWaitlistForm(formId, emailId, btnId, fineId, sourceLabel) {
+      var form = document.getElementById(formId);
+      var emailInput = document.getElementById(emailId);
+      var submitBtn = document.getElementById(btnId);
+      var fine = document.getElementById(fineId);
+      var fineDefault = fine.textContent;
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var email = emailInput.value.trim();
+        if (!email) return;
+
+        if (SHEET_WEB_APP_URL.indexOf('PASTE_YOUR') === 0) {
+          fine.textContent = 'Setup incomplete: add your Google Sheet URL in the code.';
+          fine.style.color = '#b23b3b';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Joining...';
+
+        fetch(SHEET_WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            email: email,
+            source: sourceLabel,
+            page: window.location.href,
+            timestamp: new Date().toISOString()
+          })
+        })
+        .then(function () {
+          form.style.display = 'none';
+          fine.textContent = "You're on the list! Watch your inbox for launch news and your 20% code.";
+          fine.style.color = '';
+        })
+        .catch(function () {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Get Early Access';
+          fine.textContent = 'Something went wrong. Please try again.';
+          fine.style.color = '#b23b3b';
+          setTimeout(function () {
+            fine.textContent = fineDefault;
+            fine.style.color = '';
+          }, 4000);
+        });
+      });
+    }
+
+    setupWaitlistForm('popupForm', 'popupEmail', 'popupSubmitBtn', 'popupFine', 'prelaunch-popup');
+    setupWaitlistForm('drawerWaitlistForm', 'drawerWaitlistEmail', 'drawerWaitlistSubmitBtn', 'drawerWaitlistFine', 'hamburger-drawer');
 
     var drawer = document.getElementById('drawer');
     var drawerOverlay = document.getElementById('drawerOverlay');

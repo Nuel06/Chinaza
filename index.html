@@ -90,6 +90,17 @@
     pointer-events: none;
   }
 
+  /* soft glass tone over the photo — takes the glare/brightness down a notch
+     without blurring the product itself */
+  .hero-tone {
+    position: absolute;
+    inset: 0;
+    -webkit-backdrop-filter: brightness(0.9) contrast(1.03) saturate(1.05);
+    backdrop-filter: brightness(0.9) contrast(1.03) saturate(1.05);
+    background: rgba(54,45,29,0.06);
+    pointer-events: none;
+  }
+
   /* header sits on top of the photo */
   header {
     position: relative;
@@ -119,7 +130,7 @@
 
   .icon-btn {
     background: none; border: none; cursor: pointer; color: var(--cream);
-    display: flex; align-items: center; margin-left: 0px;
+    display: flex; align-items: center; margin-left: 0px; padding: 0;
   }
   .icon-btn:first-child { margin-left: 0; }
   .icon-btn svg { width: 20px; height: 20px; }
@@ -130,6 +141,7 @@
     .nav-side.left { display: none; }
     .hamburger { display: flex; }
     .logo-word { font-size: 30px; letter-spacing: 0.16em; }
+    .nav-side.right { gap: 14px; }
   }
 
   /* overlaid collection title, bottom of hero */
@@ -138,6 +150,18 @@
     z-index: 4;
     margin-top: auto;
     padding: 0 6% 54px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hero-glass-card {
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    background: rgba(246,240,234,0.14);
+    border: 1px solid rgba(246,240,234,0.28);
+    border-radius: 22px;
+    padding: 30px 56px;
+    box-shadow: 0 12px 40px rgba(20,15,8,0.18), inset 0 1px 0 rgba(255,255,255,0.2);
     text-align: center;
   }
 
@@ -145,7 +169,7 @@
     font-size: 12px;
     letter-spacing: 0.26em;
     text-transform: uppercase;
-    color: rgba(246,240,234,0.85);
+    color: rgba(246,240,234,0.9);
     font-weight: 600;
     margin-bottom: 14px;
   }
@@ -162,6 +186,7 @@
   @media (max-width: 640px) {
     .hero { min-height: 78vh; }
     .hero-caption { padding-bottom: 40px; }
+    .hero-glass-card { padding: 22px 28px; border-radius: 18px; }
   }
 
   /* ---------- SUB-BAR : sample-sale CTA + breadcrumb, under the hero ---------- */
@@ -684,6 +709,7 @@
 
 <section class="hero">
   <div class="hero-photo"></div>
+  <div class="hero-tone"></div>
   <div class="hero-scrim-top"></div>
   <div class="hero-scrim-bottom"></div>
 
@@ -718,8 +744,10 @@
   </header>
 
   <div class="hero-caption">
-    <p class="hero-eyebrow">Hand-Crocheted Slow Fashion</p>
-    <h1 class="hero-title">The Collection</h1>
+    <div class="hero-glass-card">
+      <p class="hero-eyebrow">Hand-Crocheted Slow Fashion</p>
+      <h1 class="hero-title">The Collection</h1>
+    </div>
   </div>
 </section>
 
